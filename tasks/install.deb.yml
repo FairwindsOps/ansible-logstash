@@ -1,5 +1,8 @@
 ---
 
+- name: logstash-install | Add logstash repo key
+  apt_key: url="{{ logstash_apt_key }}" state=present
+
 - name: logstash-install | Add repositories
   apt_repository: repo='{{item}}' update_cache=yes
   with_items: logstash_apt_repositories
@@ -12,13 +15,8 @@
   apt: pkg={{item}}
   with_items: logstash_apt_common_pkgs
 
-- name: logstash-install | Download logstash
-  get_url: url={{logstash_url}} dest={{logstash_home}}/logstash.deb
-  register: logstash_downloaded
-
 - name: logstash-install | Install logstash
-  apt: deb={{logstash_home}}/logstash.deb
-  when: logstash_downloaded.changed
+  apt: name="logstash" state="present" update_cache="yes"
 
 - name: logstash-install | Download logstash forwarder
   get_url: url={{logstash_forwarder_url}} dest={{logstash_home}}/logstash-forwarder.deb
